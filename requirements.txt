@@ -1,0 +1,15 @@
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pandas>=2.0.0
+numpy>=1.26.0
+openpyxl>=3.1.0
+python-multipart>=0.0.9
+python-dotenv>=1.0.0
+python-dateutil>=2.9.0
+
+# High-performance Excel reading (Polars large-scale endpoint)
+polars>=0.20.0
+xlsx2csv>=0.8.0
+
+# Optional: Google Gemini AI column mapping
+# google-genai>=0.5.0
