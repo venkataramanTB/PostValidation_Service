@@ -13,3 +13,5 @@ Required_files/
 
 node_modules/
 release/
+/docs
+/Lib
