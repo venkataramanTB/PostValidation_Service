@@ -70,6 +70,9 @@ def step1_react():
     print("\n" + "=" * 60)
     print("STEP 1: Building React frontend")
     print("=" * 60)
+    if not (ROOT / "frontend" / "node_modules").exists():
+        print("Installing frontend npm dependencies...")
+        run("npm install", cwd=ROOT / "frontend")
     run("npm run build", cwd=ROOT / "frontend")
     assert (ROOT / "frontend" / "build" / "index.html").exists(), "React build failed"
     print("React build OK")
