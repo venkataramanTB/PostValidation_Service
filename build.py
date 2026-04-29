@@ -34,7 +34,7 @@ def generate_icon():
     from PIL import Image, ImageDraw
 
     icon_path = ROOT / "assets" / "icon.ico"
-    if icon_path.exists():
+    if icon_path.exists() and icon_path.stat().st_size > 0:
         print(f"Using existing icon: {icon_path}")
         return
     icon_path.parent.mkdir(parents=True, exist_ok=True)
