@@ -1,0 +1,16 @@
+{
+  "name": "postvalidation-service",
+  "version": "1.0.0",
+  "description": "PostValidation Service Desktop Application",
+  "main": "electron/main.js",
+  "author": "Mythics",
+  "private": true,
+  "scripts": {
+    "electron": "electron .",
+    "pack": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0"
+  }
+}
