@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000/api",
-  timeout: 300000   // 5 min default; large-scale validation overrides per-request
+  baseURL: "http://127.0.0.1:8000/api",
+  timeout: 300000
 });
 
 /* ---------- REQUEST INTERCEPTOR ---------- */
