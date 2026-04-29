@@ -12,6 +12,7 @@ files:
 
 asarUnpack:
   - assets/icon.ico
+  - backend/
 
 extraResources:
   - from: dist/backend/
