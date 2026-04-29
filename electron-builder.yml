@@ -29,6 +29,8 @@ nsis:
   allowToChangeInstallationDirectory: true
   installerIcon: assets/icon.ico
   uninstallerIcon: assets/icon.ico
+  installerSidebar: assets/installer-sidebar.bmp
+  installerHeader: assets/installer-header.bmp
   shortcutName: PostValidation Service
   createDesktopShortcut: true
   createStartMenuShortcut: true

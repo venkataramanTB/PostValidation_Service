@@ -13,6 +13,10 @@ a = Analysis(
     binaries=[],
     datas=datas,
     hiddenimports=[
+        "uvicorn",
+        "uvicorn.config",
+        "uvicorn.main",
+        "uvicorn.server",
         "uvicorn.logging",
         "uvicorn.loops",
         "uvicorn.loops.auto",

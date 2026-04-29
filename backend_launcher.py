@@ -1,11 +1,12 @@
-﻿import multiprocessing
+import multiprocessing
 import sys
+
 
 if getattr(sys, "frozen", False):
     multiprocessing.freeze_support()
 
 import uvicorn
-from main import app  # explicit import so PyInstaller bundles main.py
+from main import app 
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
