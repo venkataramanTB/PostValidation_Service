@@ -43,6 +43,7 @@ function spawnBackend() {
     logStream.on('error', (err) => {
       console.error(`[main] backend log write error: ${err.message}`);
     });
+    logStream.write(`\n--- PostValidation backend started ${new Date().toISOString()} ---\n`);
   } catch (err) {
     console.error(`[main] Could not open backend log: ${err.message}`);
   }
@@ -186,4 +187,4 @@ app.whenReady().then(async () => {
 });
 
 app.on('before-quit', () => { isQuitting = true; killBackend(); });
-app.on('window-all-closed', () => { killBackend(); app.quit(); });
+app.on('window-all-closed', () => { isQuitting = true; killBackend(); app.quit(); });
