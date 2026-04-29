@@ -34,6 +34,9 @@ def generate_icon():
     from PIL import Image, ImageDraw
 
     icon_path = ROOT / "assets" / "icon.ico"
+    if icon_path.exists():
+        print(f"Using existing icon: {icon_path}")
+        return
     icon_path.parent.mkdir(parents=True, exist_ok=True)
 
     sizes = [256, 128, 64, 48, 32, 24, 16]  # largest first
