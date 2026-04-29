@@ -50,6 +50,27 @@ except Exception:
 
 load_dotenv()
 
+
+def _get_writable_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        base = Path(
+            os.environ.get(
+                "POSTVALIDATION_DATA_DIR",
+                os.path.join(os.environ.get("APPDATA", ""), "PostValidation"),
+            )
+        )
+    else:
+        base = Path("Required_files")
+    base.mkdir(parents=True, exist_ok=True)
+    return base
+
+
+def _get_resource_path(relative_path: str) -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS) / relative_path
+    return Path(relative_path)
+
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s — %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -58,6 +79,8 @@ ORIGINS = [o.strip() for o in _allowed_origins.split(",") if o.strip()] or [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://localhost:8080",
+    "http://127.0.0.1",
+    "null",
 ]
 
 app = FastAPI(
@@ -73,6 +96,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.post("/api/excel/sheets")
 async def get_excel_sheets(
@@ -109,7 +136,7 @@ async def get_excel_sheets(
             columns_dict[sheet] = df.columns.tolist()
 
         # Prepare save directory
-        save_dir = Path("Required_files/Post-Validation_Excels")
+        save_dir = _get_writable_dir() / "Post-Validation_Excels"
         save_dir.mkdir(parents=True, exist_ok=True)
 
         # File name pattern: Customer_Instance_#.xlsx
@@ -2996,7 +3023,7 @@ async def get_finance_menu_items():
     returns the json file content as is.
     """
     try:
-        menu_file_path = Path("Required_files/finance_menu_items.json")
+        menu_file_path = _get_resource_path("Required_files/finance_menu_items.json")
         with open(menu_file_path, "r") as f:
             menu_items = json.load(f)
             final = {
