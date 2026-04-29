@@ -1,7 +1,8 @@
-'use strict';
+﻿'use strict';
 
 const { app, BrowserWindow, dialog, session } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { spawn } = require('child_process');
 const http = require('http');
 
@@ -29,21 +30,29 @@ function iconPath() {
 
 function spawnBackend() {
   const exePath = backendExePath();
-  const exeDir = path.dirname(exePath); // Get the folder containing backend.exe
+  const exeDir = path.dirname(exePath);
   const dataDir = path.join(app.getPath('appData'), 'PostValidation');
+
+  fs.mkdirSync(dataDir, { recursive: true });
+  const logStream = fs.createWriteStream(
+    path.join(dataDir, 'backend.log'),
+    { flags: 'a' }
+  );
 
   backendProcess = spawn(exePath, [], {
     windowsHide: true,
-    // CRITICAL: Set the current working directory to the backend's folder. 
-    // This allows Windows to find python3.dll and other dependencies next to the exe.
-    cwd: exeDir, 
+    cwd: exeDir,
+    stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, POSTVALIDATION_DATA_DIR: dataDir },
   });
-  
+
+  backendProcess.stdout.pipe(logStream);
+  backendProcess.stderr.pipe(logStream);
+
   backendProcess.on('error', (err) => {
     if (!isQuitting) showCrashDialog(`Could not start backend: ${err.message}\nPath: ${exePath}`);
   });
-  
+
   backendProcess.on('exit', (code) => {
     if (!isQuitting && code !== 0) showCrashDialog(`Backend exited (code ${code}).`);
   });
