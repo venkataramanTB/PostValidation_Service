@@ -34,11 +34,9 @@ def generate_icon():
     from PIL import Image, ImageDraw
 
     icon_path = ROOT / "assets" / "icon.ico"
-    if icon_path.exists():
-        print(f"Using existing icon: {icon_path}")
-        return
     icon_path.parent.mkdir(parents=True, exist_ok=True)
-    sizes = [16, 24, 32, 48, 64, 128, 256]
+
+    sizes = [256, 128, 64, 48, 32, 24, 16]  # largest first
     images = []
     for sz in sizes:
         img = Image.new("RGBA", (sz, sz), (0, 0, 0, 0))
@@ -57,13 +55,15 @@ def generate_icon():
                 fill=(240, 235, 224),
             )
         images.append(img)
+
+    # Save: primary image is 256x256 (images[0])
     images[0].save(
         str(icon_path),
         format="ICO",
         sizes=[(s, s) for s in sizes],
         append_images=images[1:],
     )
-    print(f"Generated icon: {icon_path}")
+    print(f"Generated icon: {icon_path} (primary: 256x256)")
 
 
 def step1_react():
