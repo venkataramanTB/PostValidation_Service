@@ -14,7 +14,7 @@ let isQuitting = false;
 function backendExePath() {
   return isDev
     ? path.join(__dirname, '..', 'dist', 'backend', 'backend.exe')
-    : path.join(process.resourcesPath, 'backend', 'backend.exe');
+    : path.join(process.resourcesPath, 'app.asar.unpacked', 'backend', 'backend.exe');
 }
 
 function frontendIndexPath() {
@@ -28,14 +28,22 @@ function iconPath() {
 }
 
 function spawnBackend() {
+  const exePath = backendExePath();
+  const exeDir = path.dirname(exePath); // Get the folder containing backend.exe
   const dataDir = path.join(app.getPath('appData'), 'PostValidation');
-  backendProcess = spawn(backendExePath(), [], {
+
+  backendProcess = spawn(exePath, [], {
     windowsHide: true,
+    // CRITICAL: Set the current working directory to the backend's folder. 
+    // This allows Windows to find python3.dll and other dependencies next to the exe.
+    cwd: exeDir, 
     env: { ...process.env, POSTVALIDATION_DATA_DIR: dataDir },
   });
+  
   backendProcess.on('error', (err) => {
-    if (!isQuitting) showCrashDialog(`Could not start backend: ${err.message}`);
+    if (!isQuitting) showCrashDialog(`Could not start backend: ${err.message}\nPath: ${exePath}`);
   });
+  
   backendProcess.on('exit', (code) => {
     if (!isQuitting && code !== 0) showCrashDialog(`Backend exited (code ${code}).`);
   });

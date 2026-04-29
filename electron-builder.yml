@@ -9,14 +9,15 @@ files:
   - electron/**/*
   - frontend/build/**/*
   - package.json
+  # 1. Map the compiled backend explicitly into the app
+  - from: dist/backend
+    to: backend
 
 asarUnpack:
-  - assets/icon.ico
-  - backend/
+  # 2. Tell electron-builder to unpack the backend folder from the ASAR
+  - backend/**/*
 
 extraResources:
-  - from: dist/backend/
-    to: backend/
   - from: assets/icon.ico
     to: icon.ico
 
