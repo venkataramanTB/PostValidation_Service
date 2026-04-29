@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 const { app, BrowserWindow, dialog, session } = require('electron');
 const path = require('path');
@@ -33,21 +33,32 @@ function spawnBackend() {
   const exeDir = path.dirname(exePath);
   const dataDir = path.join(app.getPath('appData'), 'PostValidation');
 
-  fs.mkdirSync(dataDir, { recursive: true });
-  const logStream = fs.createWriteStream(
-    path.join(dataDir, 'backend.log'),
-    { flags: 'a' }
-  );
+  let logStream = null;
+  try {
+    fs.mkdirSync(dataDir, { recursive: true });
+    logStream = fs.createWriteStream(
+      path.join(dataDir, 'backend.log'),
+      { flags: 'a' }
+    );
+    logStream.on('error', (err) => {
+      console.error(`[main] backend log write error: ${err.message}`);
+    });
+  } catch (err) {
+    console.error(`[main] Could not open backend log: ${err.message}`);
+  }
 
   backendProcess = spawn(exePath, [], {
     windowsHide: true,
     cwd: exeDir,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: logStream ? ['ignore', 'pipe', 'pipe'] : 'ignore',
     env: { ...process.env, POSTVALIDATION_DATA_DIR: dataDir },
   });
 
-  backendProcess.stdout.pipe(logStream);
-  backendProcess.stderr.pipe(logStream);
+  if (logStream) {
+    backendProcess.stdout.pipe(logStream, { end: false });
+    backendProcess.stderr.pipe(logStream, { end: false });
+    backendProcess.on('close', () => logStream.end());
+  }
 
   backendProcess.on('error', (err) => {
     if (!isQuitting) showCrashDialog(`Could not start backend: ${err.message}\nPath: ${exePath}`);
