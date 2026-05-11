@@ -1,4 +1,4 @@
-import os
+﻿import os
 import io
 import re
 import gc
@@ -1595,6 +1595,7 @@ async def post_validation_excel(
                     style_sheet_header(main_workbook, sheet, fill_header_err)
             style_configuration_sheet(main_workbook, "Configuration")
             main_workbook["Configuration"].sheet_state = "hidden"
+            main_workbook.active = main_workbook["Summary"]
             if includeSourceTargetFiles:
                 for sheet_name in main_workbook.sheetnames:
                     if sheet_name.startswith(sheet_full_data):
@@ -2787,6 +2788,7 @@ def _run_validation_job(job_id: str, p: dict):
                     _style_header(wb, sn, fill_header_err)
             _style_config(wb)
             wb["Configuration"].sheet_state = "hidden"
+            wb.active = wb["Summary"]
 
             # Style full data sheets inside main workbook (if included)
             if include_src_tgt:

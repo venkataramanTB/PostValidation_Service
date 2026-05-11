@@ -1,9 +1,9 @@
-'use strict';
+﻿'use strict';
 
 const { app, BrowserWindow, dialog, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const http = require('http');
 
 const isDev = !app.isPackaged;
@@ -71,12 +71,31 @@ function spawnBackend() {
 }
 
 function killBackend() {
-  if (!backendProcess) return;
-  backendProcess.kill('SIGTERM');
-  setTimeout(() => {
-    if (backendProcess && !backendProcess.killed) backendProcess.kill('SIGKILL');
-  }, 3000);
+  const proc = backendProcess;
   backendProcess = null;
+
+  if (proc && proc.pid) {
+    // taskkill /T kills the entire process tree; /F forces termination
+    try {
+      execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: 'ignore' });
+    } catch (_) {
+      try { proc.kill(); } catch (_2) {}
+    }
+  }
+
+  // Safety net: free port 8000 if it is still bound after killing by PID
+  try {
+    const out = execSync('netstat -ano', { encoding: 'utf8' });
+    for (const line of out.split('\n')) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length >= 5 && parts[1] && parts[1].endsWith(':8000')) {
+        const pid = parseInt(parts[4], 10);
+        if (pid > 4) {
+          try { execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' }); } catch (_) {}
+        }
+      }
+    }
+  } catch (_) {}
 }
 
 function showCrashDialog(detail) {
